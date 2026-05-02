@@ -34,7 +34,7 @@ const Hero = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 1 }}
           >
-            Sarah & James
+            Pranathi & Kishaiyan
           </motion.h1>
           
           <motion.p 

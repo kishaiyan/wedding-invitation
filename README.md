@@ -98,4 +98,4 @@ This project was developed with a focus on elegance and performance.
 
 ---
 
-Made with ❤️ for Sarah & James.
+Made with ❤️ for Pranathi & Kishaiyan.

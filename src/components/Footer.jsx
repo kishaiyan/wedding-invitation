@@ -9,7 +9,7 @@ const Footer = () => {
         viewport={{ once: true }}
         transition={{ duration: 1 }}
       >
-        <h2 className="text-3xl font-serif text-sage mb-2">Sarah & James</h2>
+        <h2 className="text-3xl font-serif text-sage mb-2">Pranathi & Kishaiyan</h2>
         <p className="text-gray-500 font-sans tracking-widest uppercase text-sm mb-6">08.24.2026</p>
         
         <div className="w-12 h-px bg-gold mx-auto mb-6" />
@@ -19,7 +19,7 @@ const Footer = () => {
         </p>
         
         <div className="mt-12 text-gray-400 text-xs font-sans">
-          &copy; 2026 Sarah & James Wedding. All rights reserved.
+          &copy; 2026 Pranathi & Kishaiyan Wedding. All rights reserved.
         </div>
       </motion.div>
     </footer>

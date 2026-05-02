@@ -30,7 +30,7 @@ const OurStory = () => {
               From cross-country road trips to quiet Sunday mornings, we've built a life filled with laughter, adventure, and an ever-growing collection of memories. 
             </p>
             <p>
-              On a snowy evening in Central Park, James finally asked the question Sarah already knew the answer to. Now, we're so excited to start this next chapter of our journey with all of you.
+              On a snowy evening in Central Park, Kishaiyan finally asked the question Pranathi already knew the answer to. Now, we're so excited to start this next chapter of our journey with all of you.
             </p>
           </motion.div>
 
