@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 
 const RSVP = () => {
@@ -7,11 +7,19 @@ const RSVP = () => {
     name: '',
     email: '',
     guests: '1',
-    message: ''
+    message: '',
+    website_source: 'wedding_invite_v1', // Hidden source key
+    _honeypot: '' // Anti-bot field
   });
   
-  const [status, setStatus] = useState('idle'); // idle, loading, success, error
+  const [status, setStatus] = useState(() => {
+    return localStorage.getItem('has_rsvped') === 'true' ? 'success' : 'idle';
+  });
   const [errorMsg, setErrorMsg] = useState('');
+  const [savedName, setSavedName] = useState(() => {
+    return localStorage.getItem('rsvped_name') || '';
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,28 +28,46 @@ const RSVP = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // 1. Honeypot check: If this hidden field is filled, it's a bot
+    if (formData._honeypot) {
+      console.warn('Bot detected');
+      return;
+    }
+
+    // 2. Prevent rapid multiple clicks
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
     setStatus('loading');
     
     const scriptUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
 
     try {
-      const response = await fetch(scriptUrl, {
+      await fetch(scriptUrl, {
         method: 'POST',
-        mode: 'no-cors', // Apps Script often requires no-cors for simple POST
+        mode: 'no-cors',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
       });
 
-      // Since we use no-cors, we can't actually check response.ok
-      // We assume success if no error was thrown
+      localStorage.setItem('has_rsvped', 'true');
+      localStorage.setItem('rsvped_name', formData.name);
+      setSavedName(formData.name);
       setStatus('success');
     } catch (error) {
       console.error('RSVP Error:', error);
       setStatus('error');
       setErrorMsg('Something went wrong. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  const handleEdit = () => {
+    setStatus('idle');
   };
 
   const containerVariants = {
@@ -62,30 +88,53 @@ const RSVP = () => {
   };
 
   if (status === 'success') {
+    const displayName = (formData.name || savedName).split(' ')[0];
     return (
-      <section id="rsvp" className="py-24 px-6 bg-white">
-        <div className="max-w-md mx-auto">
+      <section id="rsvp" className="py-24 px-6 bg-white overflow-hidden relative">
+        {/* Success Burst Background */}
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+          <motion.div 
+            initial={{ scale: 0, opacity: 1 }}
+            animate={{ scale: 4, opacity: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="w-64 h-64 rounded-full bg-gold/10"
+          />
+        </div>
+
+        <div className="max-w-md mx-auto relative z-10">
           <motion.div 
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="bg-ivory p-12 rounded-3xl shadow-2xl text-center border-2 border-gold/20"
           >
             <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", damping: 12, stiffness: 200, delay: 0.2 }}
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: "spring", damping: 10, stiffness: 150, delay: 0.2 }}
             >
-              <CheckCircle2 className="w-20 h-20 text-sage mx-auto mb-6" />
+              <CheckCircle2 className="w-24 h-24 text-sage mx-auto mb-6" />
             </motion.div>
-            <h2 className="text-3xl font-serif text-gray-800 mb-4">See you there!</h2>
-            <p className="text-gray-600 font-sans mb-8">
-              Thank you for your RSVP, {formData.name.split(' ')[0]}. We're so excited to celebrate with you!
+            <h2 className="text-4xl font-serif text-gray-800 mb-4">You're In!</h2>
+            <p className="text-gray-600 font-sans mb-8 text-lg">
+              Thank you for your RSVP, {displayName}! We've saved a spot for you at the celebration of a lifetime.
             </p>
+            
+            <div className="w-12 h-px bg-gold mx-auto mb-8 opacity-50" />
+            
+            <div className="mb-8">
+              <h3 className="text-2xl font-serif text-sage mb-1">Pranathi & Kishaiyan</h3>
+              <p className="text-gray-500 font-sans tracking-[0.2em] uppercase text-[10px]">November 26, 2026</p>
+            </div>
+
+            <p className="text-gray-500 font-sans italic text-sm mb-8 px-4">
+              "Thank you for being a part of our journey. We can't wait to celebrate with you."
+            </p>
+
             <button 
-              onClick={() => setStatus('idle')}
-              className="text-gold font-sans font-medium hover:text-sage transition-colors"
+              onClick={handleEdit}
+              className="bg-white/50 px-6 py-2 rounded-full text-gold font-sans text-xs font-medium hover:text-sage hover:bg-white transition-all border border-gold/10"
             >
-              Edit Response
+              Update Response
             </button>
           </motion.div>
         </div>
@@ -116,6 +165,17 @@ const RSVP = () => {
           className="space-y-6 bg-ivory/30 p-8 md:p-12 rounded-3xl border border-sage/10 shadow-inner"
         >
           <motion.div variants={itemVariants} className="grid md:grid-cols-2 gap-6">
+            {/* Honeypot field - Hidden from users */}
+            <div className="hidden" aria-hidden="true">
+              <input
+                type="text"
+                name="_honeypot"
+                value={formData._honeypot}
+                onChange={handleChange}
+                tabIndex="-1"
+                autoComplete="off"
+              />
+            </div>
             <div className="space-y-2">
               <label htmlFor="name" className="block text-sm font-sans font-medium text-gray-700 ml-1">Full Name</label>
               <input
@@ -186,12 +246,12 @@ const RSVP = () => {
           <motion.button
             variants={itemVariants}
             type="submit"
-            disabled={status === 'loading'}
+            disabled={isSubmitting}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="w-full bg-gold hover:bg-gold/90 text-white font-sans font-semibold py-4 rounded-xl shadow-lg shadow-gold/20 transition-all flex items-center justify-center gap-2 disabled:opacity-70"
           >
-            {status === 'loading' ? (
+            {isSubmitting ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
                 Sending...
