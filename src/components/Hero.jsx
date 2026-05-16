@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
-import heroVideo from '../assets/Create_a_beautiful_cinematic_a.mp4';
-import heroPoster from '../assets/ChatGPT Image May 16, 2026, 08_21_04 AM.png';
+import heroVideo from '../assets/mp4.mp4';
+import heroPoster from '../assets/us.png';
 
 const HEARTS = [...Array(12)].map((_, i) => ({
   id: i,

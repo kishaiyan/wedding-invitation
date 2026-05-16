@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import cinematicPhoto from '../assets/ChatGPT Image May 16, 2026, 08_21_04 AM.png';
+import cinematicPhoto from '../assets/us.png';
 
 const images = [
   { url: cinematicPhoto, caption: 'Our Sacred Journey' },
