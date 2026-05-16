@@ -4,17 +4,6 @@ import { Heart } from 'lucide-react';
 import heroVideo from '../assets/mp4.mp4';
 import heroPoster from '../assets/us.png';
 
-const HEARTS = [...Array(12)].map((_, i) => ({
-  id: i,
-  x: Math.random() * 100 + "%",
-  scale: Math.random() * 0.5 + 0.5,
-  rotateStart: Math.random() * 360,
-  rotateEnd: Math.random() * 360 + 360,
-  xEnd: (Math.random() * 100 - 10) + "%",
-  duration: Math.random() * 10 + 15,
-  delay: Math.random() * 10,
-  size: Math.random() * 20 + 10
-}));
 
 const Hero = () => {
   const targetDate = useMemo(() => new Date('2026-11-26T06:00:00'), []);
@@ -77,35 +66,6 @@ const Hero = () => {
       {/* Overlay - Using opacity instead of heavy backdrop-blur for performance */}
       <div className="absolute inset-0 bg-black/60" />
 
-
-      {/* Floating Hearts Animation */}
-      <div className="absolute inset-0 pointer-events-none">
-        {HEARTS.map((heart) => (
-          <motion.div
-            key={heart.id}
-            className="absolute text-white/20"
-            initial={{ 
-              x: heart.x, 
-              y: "110%", 
-              scale: heart.scale,
-              rotate: heart.rotateStart
-            }}
-            animate={{ 
-              y: "-10%",
-              rotate: heart.rotateEnd,
-              x: heart.xEnd
-            }}
-            transition={{ 
-              duration: heart.duration, 
-              repeat: Infinity, 
-              ease: "linear",
-              delay: heart.delay
-            }}
-          >
-            <Heart fill="currentColor" size={heart.size} />
-          </motion.div>
-        ))}
-      </div>
 
       {/* Content */}
       <div className="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
